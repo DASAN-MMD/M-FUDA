@@ -110,31 +110,3 @@ class MKMMDLoss(torch.nn.Module):
         return mmd_loss
 
 
-class JMMDLoss(torch.nn.Module):
-    def __init__(self, kernel_mul=2.0, kernel_num=5, fix_parameters=True):
-        super(JMMDLoss, self).__init__()
-        self.kernel_mul = kernel_mul
-        self.kernel_num = kernel_num
-        self.fix_parameters = fix_parameters
-
-    def gaussian_kernel(self, x, y, bandwidth):
-        pairwise_dist = torch.sum((x - y) ** 2, dim=1)
-        kernel = torch.exp(-pairwise_dist / (2 * bandwidth ** 2))
-        return kernel
-
-    def forward(self, source_features, target_features):
-        n = source_features.size(0)
-        m = target_features.size(0)
-
-        # Compute Gaussian kernel bandwidth
-        bandwidth = ((torch.sum(source_features ** 2) + torch.sum(target_features ** 2)) / (n + m)).sqrt()
-
-        # Compute the kernel matrices
-        K_ss = self.gaussian_kernel(source_features, source_features, bandwidth)
-        K_tt = self.gaussian_kernel(target_features, target_features, bandwidth)
-        K_st = self.gaussian_kernel(source_features, target_features, bandwidth)
-
-        # Mean of the MMD terms
-        loss = K_ss.mean() + K_tt.mean() - 2 * K_st.mean()
-
-        return loss
