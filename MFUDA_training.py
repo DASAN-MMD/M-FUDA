@@ -128,8 +128,8 @@ def train(model):
         if cuda:
             source_data, source_label = source_data.to(device), source_label.to(device)
             target_data = target_data.to(device)
-        source_data, source_label = Variable(source_data), Variable(source_label)
-        target_data = Variable(target_data)
+        #source_data, source_label = Variable(source_data), Variable(source_label)
+        #target_data = Variable(target_data)
         optimizer.zero_grad()
 
         cls_loss, mmd_loss, l1_loss, csa_loss = model(source_data, target_data, source_label, mark=1)
